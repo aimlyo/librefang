@@ -203,13 +203,7 @@ Licencia MIT. Ver archivo LICENSE.
 
 ## Enlaces
 
-**Versiones en otros idiomas:**
-- [English](README.md)
-- [中文](README.zh.md)
-- [日本語](README.ja.md)
-- [한국어](README.ko.md)
-- [Español](README.es.md)
-- [Deutsch](README.de.md)
+**Versiones en otros idiomas:** [English](README.md) | [中文](README.zh.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Deutsch](README.de.md)
 
 - [GitHub](https://github.com/librefang/librefang)
 - [Sitio web](https://librefang.ai/)

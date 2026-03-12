@@ -203,13 +203,7 @@ MITライセンス。LICENSEファイルを参照してください。
 
 ## リンク
 
-**多言語バージョン：**
-- [English](README.md)
-- [中文](README.zh.md)
-- [日本語](README.ja.md)
-- [한국어](README.ko.md)
-- [Español](README.es.md)
-- [Deutsch](README.de.md)
+**多言語バージョン：** [English](README.md) | [中文](README.zh.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Deutsch](README.de.md)
 
 - [GitHub](https://github.com/librefang/librefang)
 - [ウェブサイト](https://librefang.ai/)
