@@ -48,7 +48,7 @@ LibreFang은 **오픈소스 Agent 운영 체제**입니다 — 채팅봇 프레�
 cargo install --git https://github.com/librefang/librefang librefang-cli
 librefang init
 librefang start
-# 대시보드: http://localhost:4200
+# 대시보드: http://localhost:4545
 ```
 
 ---
@@ -143,7 +143,7 @@ librefang init
 # 3. 데몬 시작
 librefang start
 
-# 4. 대시보드: http://localhost:4200
+# 4. 대시보드: http://localhost:4545
 
 # 5. Hand 활성화 — 당신을 위해 일하기 시작
 librefang hand activate researcher

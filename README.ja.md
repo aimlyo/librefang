@@ -48,7 +48,7 @@ LibreFangは**オープンソースAgent OS**です — チャットbotフレー
 cargo install --git https://github.com/librefang/librefang librefang-cli
 librefang init
 librefang start
-# ダッシュボード：http://localhost:4200
+# ダッシュボード：http://localhost:4545
 ```
 
 ---
@@ -143,7 +143,7 @@ librefang init
 # 3. デーモン起動
 librefang start
 
-# 4. ダッシュボード：http://localhost:4200
+# 4. ダッシュボード：http://localhost:4545
 
 # 5. Handをアクティブ化 — あなたのために働き始める
 librefang hand activate researcher

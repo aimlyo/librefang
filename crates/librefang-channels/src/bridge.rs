@@ -743,7 +743,7 @@ async fn dispatch_message(
                     send_response(
                         adapter,
                         &message.sender,
-                        "No agents available. Start the dashboard at http://127.0.0.1:4200 to create one.".to_string(),
+                        "No agents available. Start the dashboard at http://127.0.0.1:4545 to create one.".to_string(),
                         thread_id,
                         output_format,
                     ).await;
@@ -1001,7 +1001,7 @@ async fn dispatch_with_blocks(
                     send_response(
                         adapter,
                         &message.sender,
-                        "No agents available. Start the dashboard at http://127.0.0.1:4200 to create one.".to_string(),
+                        "No agents available. Start the dashboard at http://127.0.0.1:4545 to create one.".to_string(),
                         thread_id,
                         output_format,
                     ).await;

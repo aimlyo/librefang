@@ -48,7 +48,7 @@ El sitio web del proyecto ya está en vivo en [librefang.ai](https://librefang.a
 cargo install --git https://github.com/librefang/librefang librefang-cli
 librefang init
 librefang start
-# Panel: http://localhost:4200
+# Panel: http://localhost:4545
 ```
 
 ---
@@ -143,7 +143,7 @@ librefang init
 # 3. Iniciar daemon
 librefang start
 
-# 4. Panel: http://localhost:4200
+# 4. Panel: http://localhost:4545
 
 # 5. Activar una Hand — comienza a trabajar para ti
 librefang hand activate researcher

@@ -48,7 +48,7 @@ Die Projekt-Website ist jetzt unter [librefang.ai](https://librefang.ai/) live. 
 cargo install --git https://github.com/librefang/librefang librefang-cli
 librefang init
 librefang start
-# Dashboard: http://localhost:4200
+# Dashboard: http://localhost:4545
 ```
 
 ---
@@ -143,7 +143,7 @@ librefang init
 # 3. Daemon starten
 librefang start
 
-# 4. Dashboard: http://localhost:4200
+# 4. Dashboard: http://localhost:4545
 
 # 5. Hand aktivieren — beginnt für dich zu arbeiten
 librefang hand activate researcher
