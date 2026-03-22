@@ -1560,7 +1560,6 @@ function CanvasPageInner() {
             <Button variant="secondary" onClick={() => setShowWorkflowPanel(!showWorkflowPanel)} title={t("workflows.open_workflows")}>
               <FolderOpen className="w-4 h-4" />
             </Button>
-            <Button variant="secondary" onClick={exportWorkflow} title="Export (Cmd+E)" className="hidden sm:flex">
             <Button variant="secondary" onClick={() => setShowTemplateBrowser(true)} title={t("canvas.browse_templates")}>
               <LayoutTemplate className="w-4 h-4" />
             </Button>
