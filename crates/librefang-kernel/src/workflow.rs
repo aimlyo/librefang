@@ -602,11 +602,16 @@ impl WorkflowEngine {
     fn build_dependency_graph(
         steps: &[WorkflowStep],
     ) -> Result<HashMap<usize, Vec<usize>>, String> {
-        let name_to_idx: HashMap<&str, usize> = steps
-            .iter()
-            .enumerate()
-            .map(|(i, s)| (s.name.as_str(), i))
-            .collect();
+        // Check for duplicate step names
+        let mut name_to_idx: HashMap<&str, usize> = HashMap::new();
+        for (i, s) in steps.iter().enumerate() {
+            if let Some(prev) = name_to_idx.insert(s.name.as_str(), i) {
+                return Err(format!(
+                    "Duplicate step name '{}' at positions {} and {}",
+                    s.name, prev, i
+                ));
+            }
+        }
 
         let mut graph: HashMap<usize, Vec<usize>> = HashMap::new();
         for (i, step) in steps.iter().enumerate() {
@@ -689,7 +694,7 @@ impl WorkflowEngine {
     ) -> Result<String, String>
     where
         F: Fn(AgentId, String) -> Fut,
-        Fut: std::future::Future<Output = Result<(String, u64, u64), String>>,
+        Fut: std::future::Future<Output = Result<(String, u64, u64), String>> + Send,
     {
         // Get the run and workflow
         let (workflow, input) = {
@@ -1135,7 +1140,7 @@ impl WorkflowEngine {
     ) -> Result<String, String>
     where
         F: Fn(AgentId, String) -> Fut,
-        Fut: std::future::Future<Output = Result<(String, u64, u64), String>>,
+        Fut: std::future::Future<Output = Result<(String, u64, u64), String>> + Send,
     {
         let layers = Self::topological_sort(&workflow.steps)?;
         let mut variables: HashMap<String, String> = HashMap::new();
@@ -1258,21 +1263,25 @@ impl WorkflowEngine {
                         dep_failed,
                     ));
 
+                    // Each future returns (result, duration_ms) for per-step timing
                     if dep_failed {
-                        // Push a placeholder future that returns None immediately
                         let step_name = step.name.clone();
                         let error_mode = step.error_mode.clone();
                         futures.push(Box::pin(async move {
-                            if matches!(error_mode, ErrorMode::Fail) {
+                            let r = if matches!(error_mode, ErrorMode::Fail) {
                                 Err(format!("Step '{}' skipped: dependency failed", step_name))
                             } else {
                                 Ok(None)
-                            }
+                            };
+                            (r, 0u64)
                         })
                             as std::pin::Pin<
                                 Box<
                                     dyn std::future::Future<
-                                            Output = Result<Option<(String, u64, u64)>, String>,
+                                            Output = (
+                                                Result<Option<(String, u64, u64)>, String>,
+                                                u64,
+                                            ),
                                         > + Send,
                                 >,
                             >);
@@ -1284,10 +1293,12 @@ impl WorkflowEngine {
                         let step_name = step.name.clone();
 
                         futures.push(Box::pin(async move {
+                            let step_start = std::time::Instant::now();
                             let result =
                                 tokio::time::timeout(timeout_dur, send_message(agent_id, prompt))
                                     .await;
-                            match result {
+                            let step_duration = step_start.elapsed().as_millis() as u64;
+                            let r = match result {
                                 Ok(Ok(output)) => Ok(Some(output)),
                                 Ok(Err(e)) => match err_mode {
                                     ErrorMode::Fail => {
@@ -1301,23 +1312,27 @@ impl WorkflowEngine {
                                     }
                                     _ => Ok(None),
                                 },
-                            }
+                            };
+                            (r, step_duration)
                         })
                             as std::pin::Pin<
                                 Box<
                                     dyn std::future::Future<
-                                            Output = Result<Option<(String, u64, u64)>, String>,
+                                            Output = (
+                                                Result<Option<(String, u64, u64)>, String>,
+                                                u64,
+                                            ),
                                         > + Send,
                                 >,
                             >);
                     }
                 }
 
-                let start = std::time::Instant::now();
+                let layer_start = std::time::Instant::now();
                 let results = futures::future::join_all(futures).await;
-                let duration_ms = start.elapsed().as_millis() as u64;
+                let layer_duration_ms = layer_start.elapsed().as_millis() as u64;
 
-                for (k, result) in results.into_iter().enumerate() {
+                for (k, (result, step_duration_ms)) in results.into_iter().enumerate() {
                     let (step_idx, ref step_name, agent_id, ref agent_name, _dep_failed) =
                         step_metas[k];
                     let step = &workflow.steps[step_idx];
@@ -1331,7 +1346,7 @@ impl WorkflowEngine {
                                 output: output.clone(),
                                 input_tokens,
                                 output_tokens,
-                                duration_ms,
+                                duration_ms: step_duration_ms,
                             };
                             if let Some(r) = self.runs.write().await.get_mut(&run_id) {
                                 r.step_results.push(step_result);
@@ -1342,7 +1357,7 @@ impl WorkflowEngine {
                             last_output = output;
                             info!(
                                 step = %step_name,
-                                duration_ms,
+                                duration_ms = step_duration_ms,
                                 "DAG step completed"
                             );
                         }
@@ -1365,7 +1380,7 @@ impl WorkflowEngine {
                 info!(
                     layer = layer_idx + 1,
                     count = layer.len(),
-                    duration_ms,
+                    duration_ms = layer_duration_ms,
                     "DAG layer completed"
                 );
             }
